@@ -8,7 +8,7 @@ Scripts and utilities built with the [Scripting](https://apps.apple.com/app/id64
 
 | Script | Description |
 | ------ | ----------- |
-| [和风天气](./和风天气/) | QWeather dashboard page + home screen widget (current weather, hourly & 3-day forecast, AQI). Uses your personal QWeather API Host (2026 auth scheme). |
+| [QWeather (和风天气)](./qweather/) | QWeather dashboard page + home screen widget (current weather, hourly & 3-day forecast, AQI). Uses your personal QWeather API Host (2026 auth scheme). |
 
 ## Getting Started
 
