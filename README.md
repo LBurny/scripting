@@ -8,6 +8,7 @@ Scripts and utilities built with the [Scripting](https://apps.apple.com/app/id64
 
 | Script | Description |
 | ------ | ----------- |
+| [surge panel](./surge%20panel/) | Surge HTTP API monitoring panel: multi-instance overview, policies, traffic, requests, engine settings, plus a live-speed home-screen widget. |
 | [QWeather (和风天气)](./qweather/) | QWeather dashboard page + home screen widget (current weather, hourly & 3-day forecast, AQI). Uses your personal QWeather API Host (2026 auth scheme). |
 
 ## Getting Started
