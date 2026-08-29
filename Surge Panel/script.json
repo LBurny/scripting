@@ -1,0 +1,33 @@
+{
+  "localizedNames" : {
+    "zh" : "Surge 面板"
+  },
+  "name" : "Surge Panel",
+  "iconImage" : "",
+  "permissions" : null,
+  "contributors" : [
+
+  ],
+  "runInApp" : false,
+  "icon" : "gauge.with.needle.fill",
+  "remoteResource" : {
+    "hash" : "024ffdbb5e936c4f95de3e5baffe2003",
+    "url" : "https:\/\/github.com\/bluenight91\/Scripting-Scripts\/tree\/main\/Surge Panel",
+    "autoUpdateInterval" : 600
+  },
+  "entry" : "index.tsx",
+  "author" : {
+    "homepage" : null,
+    "name" : "Daniel",
+    "email" : "still.bag7241@fastmail.com"
+  },
+  "localizedDescriptions" : {
+    "zh" : "Surge 监控面板 2.0：多实例切换、运行态仪表、策略组、流量、请求工作台与引擎设置。"
+  },
+  "color" : "rgba(28, 140, 255, 1)",
+  "description" : "Surge monitoring panel 2.0: multi-instance switching, overview, policies, traffic, requests workspace and engine settings via Surge HTTP API.",
+  "version" : "2.0.6",
+  "intentInputTypes" : [
+
+  ]
+}
