@@ -1,0 +1,45 @@
+{
+  "entry" : "index.tsx",
+  "author" : null,
+  "localizedNames" : {
+    "es" : "",
+    "ru" : "",
+    "de" : "",
+    "ja" : "",
+    "zh" : "",
+    "pt" : "",
+    "it" : "",
+    "fr" : "",
+    "en" : ""
+  },
+  "localizedDescriptions" : {
+    "en" : "",
+    "es" : "",
+    "it" : "",
+    "pt" : "",
+    "ja" : "",
+    "fr" : "",
+    "de" : "",
+    "zh" : "",
+    "ru" : ""
+  },
+  "color" : "rgba(252, 124, 93,1)",
+  "name" : "和风天气",
+  "version" : "1.0.0",
+  "icon" : "cloud.rain.fill",
+  "contributors" : [
+
+  ],
+  "description" : null,
+  "runInApp" : true,
+  "intentInputTypes" : [
+
+  ],
+  "iconImage" : null,
+  "remoteResource" : {
+    "autoUpdateInterval" : 600,
+    "url" : "https:\/\/github.com\/7452323\/QuantumultX\/tree\/main\/Scripting\/Scripts\/和风天气",
+    "hash" : "9a36481562ce68ecf4e38e190f42c8c5"
+  },
+  "permissions" : null
+}
