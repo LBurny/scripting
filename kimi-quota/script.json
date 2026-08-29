@@ -1,0 +1,27 @@
+{
+  "version" : "1.0.0",
+  "localizedDescriptions" : {
+    "en" : "Query Kimi Code (Coding Plan) usage quota",
+    "zh" : "查询 Kimi Code(Coding Plan)的用量额度"
+  },
+  "permissions" : null,
+  "runInApp" : true,
+  "icon" : "gauge",
+  "localizedNames" : {
+    "zh" : "Kimi 额度",
+    "en" : "Kimi Quota"
+  },
+  "name" : "kimi-quota",
+  "intentInputTypes" : [
+
+  ],
+  "contributors" : [
+
+  ],
+  "description" : null,
+  "remoteResource" : null,
+  "color" : "rgba(29, 32, 36, 1)",
+  "author" : null,
+  "iconImage" : null,
+  "entry" : "index.tsx"
+}
