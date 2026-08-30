@@ -1,0 +1,13 @@
+{
+  "name": "ZCode Remote",
+  "icon": "desktopcomputer",
+  "color": "#5856D6",
+  "version": "1.0.0",
+  "description": "Open your ZCode remote connection with one tap from a home screen widget.",
+  "localizedNames": {
+    "zh": "ZCode 远程连接"
+  },
+  "localizedDescriptions": {
+    "zh": "通过桌面小组件一键打开 ZCode 远程连接页面。"
+  }
+}
