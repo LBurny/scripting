@@ -1,3 +1,7 @@
+// Runtime provides fetch for network probes; the TS lib for scripts does not
+// declare it, so declare the minimal surface used here.
+declare const fetch: (input: string, init?: { method?: string }) => Promise<{ ok: boolean }>
+
 import {
   VStack,
   HStack,
@@ -14,6 +18,7 @@ import {
   getDeviceName,
   getHost,
   getAppVersion,
+  getMachineId,
 } from "./store"
 
 // Surge-panel-style palette. Colors adapt to light / dark mode via
@@ -21,7 +26,8 @@ import {
 const GREEN = "#22C55E"
 const GREEN_DEEP = "#15803D" // stronger green for light-mode text contrast
 
-// Panel background: soft porcelain gradient in light, deep navy in dark.
+// Panel background: soft porcelain gradient in light, pure black in dark
+// (matches other apps' dark widgets, e.g. the Kimi quota panel).
 // (runtime gradient form keeps the `type: "linear"` tag)
 const PANEL_BG = {
   light: {
@@ -30,12 +36,7 @@ const PANEL_BG = {
     startPoint: { x: 0, y: 0 },
     endPoint: { x: 0.5, y: 1 },
   },
-  dark: {
-    type: "linear",
-    colors: ["#16213A", "#101828"],
-    startPoint: { x: 0, y: 0 },
-    endPoint: { x: 0.6, y: 1 },
-  },
+  dark: "#000000",
 } as unknown as DynamicShapeStyle
 
 const C: Record<string, DynamicShapeStyle> = {
@@ -45,6 +46,7 @@ const C: Record<string, DynamicShapeStyle> = {
   icon: { light: "rgba(15,23,42,0.75)", dark: "rgba(255,255,255,0.85)" },
   accent: { light: GREEN_DEEP, dark: GREEN },
   accentBg: { light: "rgba(21,128,61,0.10)", dark: "rgba(34,197,94,0.16)" },
+  chipBg: { light: "rgba(15,23,42,0.06)", dark: "rgba(255,255,255,0.10)" },
   danger: { light: "#DC2626", dark: "#EF4444" },
 }
 
@@ -103,6 +105,45 @@ function latencyText(info: Info): string {
 function latencyColor(info: Info): DynamicShapeStyle {
   if (info.status === "ready") return C.accent
   return info.status === "down" ? C.danger : C.faintText
+}
+
+/** Human-readable latency grade for the medium panel. */
+function latencyQuality(info: Info): string {
+  if (info.status === "down") return "不可达"
+  if (info.status !== "ready" || info.latency == null) return "检测中"
+  const ms = info.latency
+  return ms < 100 ? "极佳" : ms < 300 ? "良好" : ms < 800 ? "一般" : "较慢"
+}
+
+/** Small capsule chip: icon + label, used for the stats row. */
+function Chip({
+  icon,
+  text,
+  color,
+}: {
+  icon: string
+  text: string
+  color?: DynamicShapeStyle
+}) {
+  const tint = color ?? C.secondaryText
+  return (
+    <HStack
+      spacing={3}
+      padding={{ top: 4, bottom: 4, leading: 7, trailing: 7 }}
+      background={{ style: color ? C.accentBg : C.chipBg, shape: "capsule" }}
+    >
+      <Image
+        systemName={icon}
+        resizable
+        scaleToFit
+        frame={{ width: 8, height: 8 }}
+        foregroundStyle={tint}
+      />
+      <Text font={8} monospacedDigit foregroundStyle={tint} lineLimit={1}>
+        {text}
+      </Text>
+    </HStack>
+  )
 }
 
 /** Probe meta: round-trip latency + last-check time. */
@@ -186,11 +227,12 @@ export function MediumPanel({ info }: { info: Info }) {
   const device = getDeviceName(url)
   const host = getHost(url)
   const version = getAppVersion(url)
+  const mid = getMachineId(url)
 
   return (
     <VStack
       alignment="leading"
-      spacing={8}
+      spacing={7}
       padding={PANEL_PADDING}
       frame={{ maxWidth: "infinity", maxHeight: "infinity" }}
       background={{ style: PANEL_BG, shape: { type: "rect", cornerRadius: 22 } }}
@@ -209,16 +251,19 @@ export function MediumPanel({ info }: { info: Info }) {
         </VStack>
         <Spacer />
         <VStack alignment="trailing" spacing={3}>
-          <HStack spacing={3}>
+          <HStack spacing={3} alignment="firstTextBaseline">
             <Image
               systemName="bolt.fill"
               resizable
               scaleToFit
-              frame={{ width: 9, height: 9 }}
+              frame={{ width: 10, height: 10 }}
               foregroundStyle={latencyColor(info)}
             />
-            <Text font={12} monospacedDigit fontWeight="bold" foregroundStyle={latencyColor(info)} lineLimit={1}>
+            <Text font={16} monospacedDigit fontWeight="bold" foregroundStyle={latencyColor(info)} lineLimit={1}>
               {latencyText(info)}
+            </Text>
+            <Text font={9} fontWeight="semibold" foregroundStyle={latencyColor(info)} lineLimit={1}>
+              {latencyQuality(info)}
             </Text>
           </HStack>
           <HStack spacing={3}>
@@ -234,6 +279,14 @@ export function MediumPanel({ info }: { info: Info }) {
             </Text>
           </HStack>
         </VStack>
+      </HStack>
+      {/* Stats row: latency grade, transport security, app version, machine id */}
+      <HStack spacing={5}>
+        <Chip icon="speedometer" text={latencyQuality(info)} color={latencyColor(info)} />
+        <Chip icon="lock.fill" text="HTTPS" />
+        {version ? <Chip icon="app.badge" text={`v${version}`} /> : null}
+        {mid ? <Chip icon="number" text={`ID ${mid.slice(0, 4)}`} /> : null}
+        <Spacer />
       </HStack>
       <Spacer />
       <ConnectButton />
