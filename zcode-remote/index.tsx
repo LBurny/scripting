@@ -51,6 +51,13 @@ const HOME_BAR_INSET =
     ? 34
     : 0
 
+// Bottom padding applied to the WebView so web content (e.g. the chat input
+// box) ends above the overlay control bar instead of being covered by it.
+// Bar height ≈ hairline 0.5 + padding 10 + icon row ~31 + padding 10 ≈ 51.5;
+// +2.5 slack — any excess is invisible because the page background, the bar
+// and the ZStack backdrop all share BAR_BG.
+const WEBVIEW_BOTTOM_PAD = 54 + HOME_BAR_INSET
+
 type Status = "loading" | "ok" | "error"
 
 // One controller (and thus one web session) per script instance.
@@ -80,11 +87,16 @@ function SettingsSheet(props: { onSaved: (device: string) => void }) {
     // Custom dark header + manually themed List: preferredColorScheme is a
     // no-op in this runtime (device may be in light mode), so everything is
     // styled explicitly to match the main page.
-    <VStack
-      spacing={0}
+    // Root ZStack mirrors the main page: its BAR_BG background with
+    // ignoresSafeArea(bottom) paints the home-indicator strip dark — a bare
+    // VStack root would leave it white (backgrounds don't extend into the
+    // safe area).
+    <ZStack
       frame={{ maxWidth: "infinity", maxHeight: "infinity" }}
       background={{ style: BAR_BG, shape: "rect" }}
+      ignoresSafeArea={{ edges: ["bottom"] }}
     >
+      <VStack spacing={0} frame={{ maxWidth: "infinity", maxHeight: "infinity" }}>
       {/* Header: centered title + trailing Done button */}
       <ZStack
         frame={{ maxWidth: "infinity", height: 44 }}
@@ -167,7 +179,8 @@ function SettingsSheet(props: { onSaved: (device: string) => void }) {
           </Text>
         </Section>
       </List>
-    </VStack>
+      </VStack>
+    </ZStack>
   )
 }
 
@@ -260,18 +273,22 @@ function AppView() {
         ),
       }}
     >
-      {/* Full-bleed web content: extends under the status bar AND behind the
-          bottom bar / home-indicator strip (webview bg matches BAR_BG). */}
+      {/* Web content bleeds under the status bar and side edges. The bottom
+          is padded up by the control-bar height so page UI pinned to the
+          viewport bottom (chat input box) is never covered by the bar; the
+          padded strip shows the ZStack's BAR_BG, identical to the page bg. */}
       <WebView
         controller={controller}
         frame={{ maxWidth: "infinity", maxHeight: "infinity" }}
-        ignoresSafeArea={{ edges: ["top", "leading", "trailing", "bottom"] }}
+        ignoresSafeArea={{ edges: ["top", "leading", "trailing"] }}
+        padding={{ bottom: WEBVIEW_BOTTOM_PAD }}
         onAppear={() => load()}
       />
 
       {/* Bottom control bar — modern browser style.
-          Extends into the bottom safe area so the home-indicator strip
-          stays dark; content is padded back up by HOME_BAR_INSET. */}
+          Overlays the WebView's padded-out strip and extends into the bottom
+          safe area so the home-indicator strip stays dark; content is padded
+          back up by HOME_BAR_INSET. */}
       <VStack
         spacing={0}
         frame={{ maxWidth: "infinity" }}
