@@ -12,6 +12,7 @@
 | [和风天气 (qweather)](./qweather/) | 和风天气仪表页 + 桌面小组件(实况、逐小时/三天预报、空气质量)。已适配 2026 年专属 API Host 鉴权。 |
 | [Kimi 额度 (kimi-quota)](./kimi-quota/) | 查询 Kimi Code(Coding Plan)用量额度：支持多账号，App 页 + 桌面小组件，带剩余百分比与重置倒计时。 |
 | [ZCode 远程连接 (zcode-remote)](./zcode-remote/) | ZCode 远程连接启动器：App 内全屏网页 + 浏览器式控制条，桌面小组件显示在线状态、延迟，一键连接设备。 |
+| [RSS 阅读器 (reader)](./reader/) | RSS 阅读器：自研 RSS/Atom 解析（无 DOM）、内置 137 个中英日精选订阅源目录、已读/收藏、全文抓取、深色阅读主题与手势翻页，附最新文章桌面小组件。 |
 
 ## 快速开始
 

@@ -1,0 +1,1109 @@
+// lib/directory.ts — 内置订阅源目录（来自 LBurny/reader 的 feed-directory.json）
+
+export interface DirectoryEntry {
+  title: string
+  feedUrl: string
+  siteUrl: string
+  category: string
+  description: string
+  lang: "en" | "zh" | "ja"
+}
+
+export const FEED_DIRECTORY: DirectoryEntry[] = [
+  {
+    "title": "Hacker News",
+    "feedUrl": "https://news.ycombinator.com/rss",
+    "siteUrl": "https://news.ycombinator.com",
+    "category": "Tech",
+    "description": "Front-page links from the Hacker News community.",
+    "lang": "en"
+  },
+  {
+    "title": "TechCrunch",
+    "feedUrl": "https://techcrunch.com/feed/",
+    "siteUrl": "https://techcrunch.com",
+    "category": "Tech",
+    "description": "Startup and technology industry news.",
+    "lang": "en"
+  },
+  {
+    "title": "The Verge",
+    "feedUrl": "https://www.theverge.com/rss/index.xml",
+    "siteUrl": "https://www.theverge.com",
+    "category": "Tech",
+    "description": "Technology, science, art, and culture.",
+    "lang": "en"
+  },
+  {
+    "title": "Ars Technica",
+    "feedUrl": "https://feeds.arstechnica.com/arstechnica/index",
+    "siteUrl": "https://arstechnica.com",
+    "category": "Tech",
+    "description": "In-depth technology news and analysis.",
+    "lang": "en"
+  },
+  {
+    "title": "Wired",
+    "feedUrl": "https://www.wired.com/feed/rss",
+    "siteUrl": "https://www.wired.com",
+    "category": "Tech",
+    "description": "How emerging technology shapes culture and the economy.",
+    "lang": "en"
+  },
+  {
+    "title": "Engadget",
+    "feedUrl": "https://www.engadget.com/rss.xml",
+    "siteUrl": "https://www.engadget.com",
+    "category": "Tech",
+    "description": "Consumer gadgets and electronics reviews.",
+    "lang": "en"
+  },
+  {
+    "title": "MIT Technology Review",
+    "feedUrl": "https://www.technologyreview.com/feed/",
+    "siteUrl": "https://www.technologyreview.com",
+    "category": "Tech",
+    "description": "Reporting on emerging technology and its impact.",
+    "lang": "en"
+  },
+  {
+    "title": "Slashdot",
+    "feedUrl": "https://rss.slashdot.org/Slashdot/slashdotMain",
+    "siteUrl": "https://slashdot.org",
+    "category": "Tech",
+    "description": "News for nerds, stuff that matters.",
+    "lang": "en"
+  },
+  {
+    "title": "Hacker Noon",
+    "feedUrl": "https://hackernoon.com/feed",
+    "siteUrl": "https://hackernoon.com",
+    "category": "Tech",
+    "description": "Technology stories written by real developers.",
+    "lang": "en"
+  },
+  {
+    "title": "The Register",
+    "feedUrl": "https://www.theregister.com/headlines.atom",
+    "siteUrl": "https://www.theregister.com",
+    "category": "Tech",
+    "description": "Enterprise technology news with a sharp tongue.",
+    "lang": "en"
+  },
+  {
+    "title": "BBC News",
+    "feedUrl": "https://feeds.bbci.co.uk/news/rss.xml",
+    "siteUrl": "https://www.bbc.com/news",
+    "category": "News",
+    "description": "Top stories from the BBC.",
+    "lang": "en"
+  },
+  {
+    "title": "NPR News",
+    "feedUrl": "https://feeds.npr.org/1001/rss.xml",
+    "siteUrl": "https://www.npr.org",
+    "category": "News",
+    "description": "National Public Radio top news.",
+    "lang": "en"
+  },
+  {
+    "title": "Reuters Top News",
+    "feedUrl": "https://www.reutersagency.com/feed/",
+    "siteUrl": "https://www.reuters.com",
+    "category": "News",
+    "description": "Global breaking news from Reuters.",
+    "lang": "en"
+  },
+  {
+    "title": "The Guardian",
+    "feedUrl": "https://www.theguardian.com/world/rss",
+    "siteUrl": "https://www.theguardian.com",
+    "category": "News",
+    "description": "World news from The Guardian.",
+    "lang": "en"
+  },
+  {
+    "title": "Al Jazeera English",
+    "feedUrl": "https://www.aljazeera.com/xml/rss/all.xml",
+    "siteUrl": "https://www.aljazeera.com",
+    "category": "News",
+    "description": "News and analysis from Al Jazeera.",
+    "lang": "en"
+  },
+  {
+    "title": "Associated Press",
+    "feedUrl": "https://rsshub.app/apnews/topics/apf-topnews",
+    "siteUrl": "https://apnews.com",
+    "category": "News",
+    "description": "Breaking news from the Associated Press.",
+    "lang": "en"
+  },
+  {
+    "title": "CNN Top Stories",
+    "feedUrl": "http://rss.cnn.com/rss/cnn_topstories.rss",
+    "siteUrl": "https://www.cnn.com",
+    "category": "News",
+    "description": "Top stories from CNN.",
+    "lang": "en"
+  },
+  {
+    "title": "NYT Home Page",
+    "feedUrl": "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+    "siteUrl": "https://www.nytimes.com",
+    "category": "News",
+    "description": "The New York Times home page stories.",
+    "lang": "en"
+  },
+  {
+    "title": "NASA Breaking News",
+    "feedUrl": "https://www.nasa.gov/feed/",
+    "siteUrl": "https://www.nasa.gov",
+    "category": "Science",
+    "description": "The latest from NASA.",
+    "lang": "en"
+  },
+  {
+    "title": "Quanta Magazine",
+    "feedUrl": "https://api.quantamagazine.org/feed/",
+    "siteUrl": "https://www.quantamagazine.org",
+    "category": "Science",
+    "description": "Illuminating mathematics and basic science.",
+    "lang": "en"
+  },
+  {
+    "title": "ScienceDaily",
+    "feedUrl": "https://www.sciencedaily.com/rss/all.xml",
+    "siteUrl": "https://www.sciencedaily.com",
+    "category": "Science",
+    "description": "Breaking science news from research institutions.",
+    "lang": "en"
+  },
+  {
+    "title": "Nature",
+    "feedUrl": "https://www.nature.com/nature.rss",
+    "siteUrl": "https://www.nature.com",
+    "category": "Science",
+    "description": "Research and news from the journal Nature.",
+    "lang": "en"
+  },
+  {
+    "title": "Scientific American",
+    "feedUrl": "https://www.scientificamerican.com/platform/syndication/rss/",
+    "siteUrl": "https://www.scientificamerican.com",
+    "category": "Science",
+    "description": "Science news and expert commentary.",
+    "lang": "en"
+  },
+  {
+    "title": "Phys.org",
+    "feedUrl": "https://phys.org/rss-feed/",
+    "siteUrl": "https://phys.org",
+    "category": "Science",
+    "description": "Science, physics, and technology news.",
+    "lang": "en"
+  },
+  {
+    "title": "Space.com",
+    "feedUrl": "https://www.space.com/feeds/all",
+    "siteUrl": "https://www.space.com",
+    "category": "Science",
+    "description": "Space exploration and astronomy news.",
+    "lang": "en"
+  },
+  {
+    "title": "Smashing Magazine",
+    "feedUrl": "https://www.smashingmagazine.com/feed/",
+    "siteUrl": "https://www.smashingmagazine.com",
+    "category": "Design",
+    "description": "Web design and development articles.",
+    "lang": "en"
+  },
+  {
+    "title": "A List Apart",
+    "feedUrl": "https://alistapart.com/main/feed/",
+    "siteUrl": "https://alistapart.com",
+    "category": "Design",
+    "description": "For people who make websites.",
+    "lang": "en"
+  },
+  {
+    "title": "CSS-Tricks",
+    "feedUrl": "https://css-tricks.com/feed/",
+    "siteUrl": "https://css-tricks.com",
+    "category": "Design",
+    "description": "Tips and tricks for front-end web design.",
+    "lang": "en"
+  },
+  {
+    "title": "Sidebar",
+    "feedUrl": "https://sidebar.io/feed.xml",
+    "siteUrl": "https://sidebar.io",
+    "category": "Design",
+    "description": "Five hand-picked design links every day.",
+    "lang": "en"
+  },
+  {
+    "title": "UX Collective",
+    "feedUrl": "https://uxdesign.cc/feed",
+    "siteUrl": "https://uxdesign.cc",
+    "category": "Design",
+    "description": "Curated stories on user experience and design.",
+    "lang": "en"
+  },
+  {
+    "title": "Designer News",
+    "feedUrl": "https://www.designernews.co/?format=rss",
+    "siteUrl": "https://www.designernews.co",
+    "category": "Design",
+    "description": "Community-driven design news.",
+    "lang": "en"
+  },
+  {
+    "title": "Nielsen Norman Group",
+    "feedUrl": "https://www.nngroup.com/feed/rss/",
+    "siteUrl": "https://www.nngroup.com",
+    "category": "Design",
+    "description": "Evidence-based user experience research.",
+    "lang": "en"
+  },
+  {
+    "title": "The Rust Blog",
+    "feedUrl": "https://blog.rust-lang.org/feed.xml",
+    "siteUrl": "https://blog.rust-lang.org",
+    "category": "Programming",
+    "description": "Official news from the Rust programming language.",
+    "lang": "en"
+  },
+  {
+    "title": "The Go Blog",
+    "feedUrl": "https://go.dev/blog/feed.atom",
+    "siteUrl": "https://go.dev/blog",
+    "category": "Programming",
+    "description": "Official news from the Go programming language.",
+    "lang": "en"
+  },
+  {
+    "title": "Python Insider",
+    "feedUrl": "https://blog.python.org/feeds/posts/default",
+    "siteUrl": "https://blog.python.org",
+    "category": "Programming",
+    "description": "Official Python language news.",
+    "lang": "en"
+  },
+  {
+    "title": "GitHub Blog",
+    "feedUrl": "https://github.blog/feed/",
+    "siteUrl": "https://github.blog",
+    "category": "Programming",
+    "description": "Updates, ideas, and inspiration from GitHub.",
+    "lang": "en"
+  },
+  {
+    "title": "Martin Fowler",
+    "feedUrl": "https://martinfowler.com/feed.atom",
+    "siteUrl": "https://martinfowler.com",
+    "category": "Programming",
+    "description": "Essays on software design and architecture.",
+    "lang": "en"
+  },
+  {
+    "title": "Coding Horror",
+    "feedUrl": "https://blog.codinghorror.com/rss/",
+    "siteUrl": "https://blog.codinghorror.com",
+    "category": "Programming",
+    "description": "Jeff Atwood on programming and human factors.",
+    "lang": "en"
+  },
+  {
+    "title": "Julia Evans",
+    "feedUrl": "https://jvns.ca/atom.xml",
+    "siteUrl": "https://jvns.ca",
+    "category": "Programming",
+    "description": "Accessible deep dives into systems programming.",
+    "lang": "en"
+  },
+  {
+    "title": "Overreacted",
+    "feedUrl": "https://overreacted.io/rss.xml",
+    "siteUrl": "https://overreacted.io",
+    "category": "Programming",
+    "description": "Dan Abramov's personal blog on React and JavaScript.",
+    "lang": "en"
+  },
+  {
+    "title": "CSS Weekly",
+    "feedUrl": "https://css-weekly.com/feed/",
+    "siteUrl": "https://css-weekly.com",
+    "category": "Programming",
+    "description": "Weekly roundup of CSS articles and tutorials.",
+    "lang": "en"
+  },
+  {
+    "title": "LWN.net",
+    "feedUrl": "https://lwn.net/headlines/newrss",
+    "siteUrl": "https://lwn.net",
+    "category": "Programming",
+    "description": "In-depth Linux and free-software news.",
+    "lang": "en"
+  },
+  {
+    "title": "Harvard Business Review",
+    "feedUrl": "https://hbr.org/feed",
+    "siteUrl": "https://hbr.org",
+    "category": "Business",
+    "description": "Management ideas and business strategy.",
+    "lang": "en"
+  },
+  {
+    "title": "Stratechery",
+    "feedUrl": "https://stratechery.com/feed/",
+    "siteUrl": "https://stratechery.com",
+    "category": "Business",
+    "description": "Ben Thompson on the business and strategy of tech.",
+    "lang": "en"
+  },
+  {
+    "title": "The Economist",
+    "feedUrl": "https://www.economist.com/finance-and-economics/rss.xml",
+    "siteUrl": "https://www.economist.com",
+    "category": "Business",
+    "description": "Finance and economics from The Economist.",
+    "lang": "en"
+  },
+  {
+    "title": "Bloomberg Markets",
+    "feedUrl": "https://feeds.bloomberg.com/markets/news.rss",
+    "siteUrl": "https://www.bloomberg.com",
+    "category": "Business",
+    "description": "Global financial markets news.",
+    "lang": "en"
+  },
+  {
+    "title": "Forbes",
+    "feedUrl": "https://www.forbes.com/business/feed/",
+    "siteUrl": "https://www.forbes.com",
+    "category": "Business",
+    "description": "Business, investing, and entrepreneurship.",
+    "lang": "en"
+  },
+  {
+    "title": "Marginal Revolution",
+    "feedUrl": "https://marginalrevolution.com/feed",
+    "siteUrl": "https://marginalrevolution.com",
+    "category": "Business",
+    "description": "Tyler Cowen and Alex Tabarrok on economics.",
+    "lang": "en"
+  },
+  {
+    "title": "Kottke.org",
+    "feedUrl": "https://feeds.kottke.org/main",
+    "siteUrl": "https://kottke.org",
+    "category": "Culture",
+    "description": "Jason Kottke's long-running blog of fine hypertext.",
+    "lang": "en"
+  },
+  {
+    "title": "The Atlantic",
+    "feedUrl": "https://www.theatlantic.com/feed/all/",
+    "siteUrl": "https://www.theatlantic.com",
+    "category": "Culture",
+    "description": "Ideas, politics, and culture from The Atlantic.",
+    "lang": "en"
+  },
+  {
+    "title": "Aeon",
+    "feedUrl": "https://aeon.co/feed.rss",
+    "siteUrl": "https://aeon.co",
+    "category": "Culture",
+    "description": "Essays on philosophy, science, and culture.",
+    "lang": "en"
+  },
+  {
+    "title": "Longreads",
+    "feedUrl": "https://longreads.com/feed/",
+    "siteUrl": "https://longreads.com",
+    "category": "Culture",
+    "description": "The best longform storytelling on the web.",
+    "lang": "en"
+  },
+  {
+    "title": "The New Yorker",
+    "feedUrl": "https://www.newyorker.com/feed/everything",
+    "siteUrl": "https://www.newyorker.com",
+    "category": "Culture",
+    "description": "Reporting, commentary, fiction, and humor.",
+    "lang": "en"
+  },
+  {
+    "title": "Brain Pickings / The Marginalian",
+    "feedUrl": "https://www.themarginalian.org/feed/",
+    "siteUrl": "https://www.themarginalian.org",
+    "category": "Culture",
+    "description": "Maria Popova on art, science, and the search for meaning.",
+    "lang": "en"
+  },
+  {
+    "title": "Engadget Gaming",
+    "feedUrl": "https://www.engadget.com/gaming/rss.xml",
+    "siteUrl": "https://www.engadget.com/gaming",
+    "category": "Gaming",
+    "description": "Video game news and reviews.",
+    "lang": "en"
+  },
+  {
+    "title": "Polygon",
+    "feedUrl": "https://www.polygon.com/rss/index.xml",
+    "siteUrl": "https://www.polygon.com",
+    "category": "Gaming",
+    "description": "Gaming, entertainment, and pop culture.",
+    "lang": "en"
+  },
+  {
+    "title": "Rock Paper Shotgun",
+    "feedUrl": "https://www.rockpapershotgun.com/feed",
+    "siteUrl": "https://www.rockpapershotgun.com",
+    "category": "Gaming",
+    "description": "PC gaming news and opinion.",
+    "lang": "en"
+  },
+  {
+    "title": "Lifehacker",
+    "feedUrl": "https://lifehacker.com/rss",
+    "siteUrl": "https://lifehacker.com",
+    "category": "Lifestyle",
+    "description": "Tips and tricks to get things done.",
+    "lang": "en"
+  },
+  {
+    "title": "Zen Habits",
+    "feedUrl": "https://zenhabits.net/feed/",
+    "siteUrl": "https://zenhabits.net",
+    "category": "Lifestyle",
+    "description": "Leo Babauta on simplicity and mindful living.",
+    "lang": "en"
+  },
+  {
+    "title": "Smitten Kitchen",
+    "feedUrl": "https://smittenkitchen.com/feed/",
+    "siteUrl": "https://smittenkitchen.com",
+    "category": "Lifestyle",
+    "description": "Approachable home cooking recipes.",
+    "lang": "en"
+  },
+  {
+    "title": "ESPN Top Headlines",
+    "feedUrl": "https://www.espn.com/espn/rss/news",
+    "siteUrl": "https://www.espn.com",
+    "category": "Sports",
+    "description": "Top sports headlines from ESPN.",
+    "lang": "en"
+  },
+  {
+    "title": "BBC Sport",
+    "feedUrl": "https://feeds.bbci.co.uk/sport/rss.xml",
+    "siteUrl": "https://www.bbc.com/sport",
+    "category": "Sports",
+    "description": "Sports news from the BBC.",
+    "lang": "en"
+  },
+  {
+    "title": "The Pragmatic Engineer",
+    "feedUrl": "https://blog.pragmaticengineer.com/rss/",
+    "siteUrl": "https://blog.pragmaticengineer.com",
+    "category": "Programming",
+    "description": "Insider takes on big-tech engineering and careers.",
+    "lang": "en"
+  },
+  {
+    "title": "The Cloudflare Blog",
+    "feedUrl": "https://blog.cloudflare.com/rss/",
+    "siteUrl": "https://blog.cloudflare.com",
+    "category": "Programming",
+    "description": "Deep dives on networking, security and the web.",
+    "lang": "en"
+  },
+  {
+    "title": "Dan Luu",
+    "feedUrl": "https://danluu.com/atom.xml",
+    "siteUrl": "https://danluu.com",
+    "category": "Programming",
+    "description": "Sharp essays on systems and engineering culture.",
+    "lang": "en"
+  },
+  {
+    "title": "Joel on Software",
+    "feedUrl": "https://www.joelonsoftware.com/feed/",
+    "siteUrl": "https://www.joelonsoftware.com",
+    "category": "Programming",
+    "description": "Classic essays on software and building teams.",
+    "lang": "en"
+  },
+  {
+    "title": "Netflix Technology Blog",
+    "feedUrl": "https://netflixtechblog.com/feed",
+    "siteUrl": "https://netflixtechblog.com",
+    "category": "Programming",
+    "description": "How Netflix builds and scales its platform.",
+    "lang": "en"
+  },
+  {
+    "title": "Engineering at Meta",
+    "feedUrl": "https://engineering.fb.com/feed/",
+    "siteUrl": "https://engineering.fb.com",
+    "category": "Programming",
+    "description": "Meta's infrastructure and engineering work.",
+    "lang": "en"
+  },
+  {
+    "title": "Signal Blog",
+    "feedUrl": "https://signal.org/blog/rss.xml",
+    "siteUrl": "https://signal.org/blog/",
+    "category": "Programming",
+    "description": "Updates from the private-messaging project.",
+    "lang": "en"
+  },
+  {
+    "title": "Stack Overflow Blog",
+    "feedUrl": "https://stackoverflow.blog/feed/",
+    "siteUrl": "https://stackoverflow.blog",
+    "category": "Programming",
+    "description": "On code, careers and developer culture.",
+    "lang": "en"
+  },
+  {
+    "title": "OpenAI Blog",
+    "feedUrl": "https://openai.com/news/rss.xml",
+    "siteUrl": "https://openai.com/news/",
+    "category": "AI",
+    "description": "Announcements and research from OpenAI.",
+    "lang": "en"
+  },
+  {
+    "title": "Berkeley AI Research",
+    "feedUrl": "https://bair.berkeley.edu/blog/feed.xml",
+    "siteUrl": "https://bair.berkeley.edu/blog/",
+    "category": "AI",
+    "description": "Research from Berkeley's AI lab.",
+    "lang": "en"
+  },
+  {
+    "title": "The Gradient",
+    "feedUrl": "https://thegradient.pub/rss/",
+    "siteUrl": "https://thegradient.pub",
+    "category": "AI",
+    "description": "Essays and perspectives on AI research.",
+    "lang": "en"
+  },
+  {
+    "title": "Import AI",
+    "feedUrl": "https://importai.substack.com/feed",
+    "siteUrl": "https://importai.substack.com",
+    "category": "AI",
+    "description": "Weekly digest of AI research and policy.",
+    "lang": "en"
+  },
+  {
+    "title": "web.dev",
+    "feedUrl": "https://web.dev/feed.xml",
+    "siteUrl": "https://web.dev",
+    "category": "Design",
+    "description": "Modern web development guidance from Google.",
+    "lang": "en"
+  },
+  {
+    "title": "Nautilus",
+    "feedUrl": "https://nautil.us/rss/all",
+    "siteUrl": "https://nautil.us",
+    "category": "Science",
+    "description": "Science writing on big, surprising ideas.",
+    "lang": "en"
+  },
+  {
+    "title": "Singularity Hub",
+    "feedUrl": "https://singularityhub.com/feed/",
+    "siteUrl": "https://singularityhub.com",
+    "category": "Science",
+    "description": "Reporting on science and emerging technology.",
+    "lang": "en"
+  },
+  {
+    "title": "Benedict Evans",
+    "feedUrl": "https://www.ben-evans.com/benedictevans?format=rss",
+    "siteUrl": "https://www.ben-evans.com",
+    "category": "Business",
+    "description": "Analysis of tech, media and platforms.",
+    "lang": "en"
+  },
+  {
+    "title": "少数派",
+    "feedUrl": "https://sspai.com/feed",
+    "siteUrl": "https://sspai.com",
+    "category": "科技",
+    "description": "高质量的数字生活方式与效率工具推荐。",
+    "lang": "zh"
+  },
+  {
+    "title": "爱范儿",
+    "feedUrl": "https://www.ifanr.com/feed",
+    "siteUrl": "https://www.ifanr.com",
+    "category": "科技",
+    "description": "报道科技、消费电子与新生活方式。",
+    "lang": "zh"
+  },
+  {
+    "title": "36氪",
+    "feedUrl": "https://36kr.com/feed",
+    "siteUrl": "https://36kr.com",
+    "category": "科技",
+    "description": "关注创业、商业与科技前沿的资讯。",
+    "lang": "zh"
+  },
+  {
+    "title": "虎嗅网",
+    "feedUrl": "https://www.huxiu.com/rss/0.xml",
+    "siteUrl": "https://www.huxiu.com",
+    "category": "科技",
+    "description": "聚焦商业与科技的深度报道与评论。",
+    "lang": "zh"
+  },
+  {
+    "title": "极客公园",
+    "feedUrl": "https://www.geekpark.net/rss",
+    "siteUrl": "https://www.geekpark.net",
+    "category": "科技",
+    "description": "关注前沿科技产品与创新趋势。",
+    "lang": "zh"
+  },
+  {
+    "title": "奇客 Solidot",
+    "feedUrl": "https://www.solidot.org/index.rss",
+    "siteUrl": "https://www.solidot.org",
+    "category": "科技",
+    "description": "奇客的资讯，重要的东西。",
+    "lang": "zh"
+  },
+  {
+    "title": "IT之家",
+    "feedUrl": "https://www.ithome.com/rss/",
+    "siteUrl": "https://www.ithome.com",
+    "category": "科技",
+    "description": "即时的科技资讯与数码新闻。",
+    "lang": "zh"
+  },
+  {
+    "title": "钛媒体",
+    "feedUrl": "https://www.tmtpost.com/feed",
+    "siteUrl": "https://www.tmtpost.com",
+    "category": "科技",
+    "description": "关注科技与商业变革的媒体平台。",
+    "lang": "zh"
+  },
+  {
+    "title": "月光博客",
+    "feedUrl": "https://www.williamlong.info/rss.xml",
+    "siteUrl": "https://www.williamlong.info",
+    "category": "科技",
+    "description": "关注互联网与 IT 评论的老牌博客。",
+    "lang": "zh"
+  },
+  {
+    "title": "阮一峰的网络日志",
+    "feedUrl": "https://www.ruanyifeng.com/blog/atom.xml",
+    "siteUrl": "https://www.ruanyifeng.com/blog/",
+    "category": "编程",
+    "description": "技术与互联网随笔，含科技爱好者周刊。",
+    "lang": "zh"
+  },
+  {
+    "title": "酷 壳 CoolShell",
+    "feedUrl": "https://coolshell.cn/feed",
+    "siteUrl": "https://coolshell.cn",
+    "category": "编程",
+    "description": "陈皓的技术博客，分享编程与架构心得。",
+    "lang": "zh"
+  },
+  {
+    "title": "美团技术团队",
+    "feedUrl": "https://tech.meituan.com/feed/",
+    "siteUrl": "https://tech.meituan.com",
+    "category": "编程",
+    "description": "美团工程师的技术实践与经验分享。",
+    "lang": "zh"
+  },
+  {
+    "title": "V2EX",
+    "feedUrl": "https://www.v2ex.com/index.xml",
+    "siteUrl": "https://www.v2ex.com",
+    "category": "编程",
+    "description": "创意工作者聚集的技术与生活社区。",
+    "lang": "zh"
+  },
+  {
+    "title": "云风的 BLOG",
+    "feedUrl": "https://blog.codingnow.com/atom.xml",
+    "siteUrl": "https://blog.codingnow.com",
+    "category": "编程",
+    "description": "游戏引擎开发者云风的技术随笔。",
+    "lang": "zh"
+  },
+  {
+    "title": "张鑫旭-鑫空间",
+    "feedUrl": "https://www.zhangxinxu.com/wordpress/feed/",
+    "siteUrl": "https://www.zhangxinxu.com",
+    "category": "编程",
+    "description": "深入浅出的前端与 CSS 技术文章。",
+    "lang": "zh"
+  },
+  {
+    "title": "有赞技术团队",
+    "feedUrl": "https://tech.youzan.com/rss/",
+    "siteUrl": "https://tech.youzan.com",
+    "category": "编程",
+    "description": "有赞工程师的技术实践分享。",
+    "lang": "zh"
+  },
+  {
+    "title": "唐巧的博客",
+    "feedUrl": "https://blog.devtang.com/atom.xml",
+    "siteUrl": "https://blog.devtang.com",
+    "category": "编程",
+    "description": "移动开发与工程实践的技术博客。",
+    "lang": "zh"
+  },
+  {
+    "title": "DIYgod",
+    "feedUrl": "https://diygod.cc/atom.xml",
+    "siteUrl": "https://diygod.cc",
+    "category": "编程",
+    "description": "RSSHub 作者的开源与生活随笔。",
+    "lang": "zh"
+  },
+  {
+    "title": "王登科 DK 博客",
+    "feedUrl": "https://greatdk.com/feed",
+    "siteUrl": "https://greatdk.com",
+    "category": "编程",
+    "description": "独立开发者王登科的项目与思考。",
+    "lang": "zh"
+  },
+  {
+    "title": "卡瓦邦噶",
+    "feedUrl": "https://www.kawabangga.com/feed",
+    "siteUrl": "https://www.kawabangga.com",
+    "category": "编程",
+    "description": "程序员的编程经验与读书笔记。",
+    "lang": "zh"
+  },
+  {
+    "title": "小众软件",
+    "feedUrl": "https://www.appinn.com/feed/",
+    "siteUrl": "https://www.appinn.com",
+    "category": "软件",
+    "description": "发现和分享好用的小众软件。",
+    "lang": "zh"
+  },
+  {
+    "title": "异次元软件世界",
+    "feedUrl": "https://www.iplaysoft.com/feed",
+    "siteUrl": "https://www.iplaysoft.com",
+    "category": "软件",
+    "description": "软件应用与数码玩物的精选分享。",
+    "lang": "zh"
+  },
+  {
+    "title": "反斗限免",
+    "feedUrl": "https://free.apprcn.com/feed/",
+    "siteUrl": "https://free.apprcn.com",
+    "category": "软件",
+    "description": "限时免费与特价软件的每日推送。",
+    "lang": "zh"
+  },
+  {
+    "title": "Linux 中国",
+    "feedUrl": "https://linux.cn/rss.xml",
+    "siteUrl": "https://linux.cn",
+    "category": "开源",
+    "description": "Linux 与开源技术的中文资讯。",
+    "lang": "zh"
+  },
+  {
+    "title": "HelloGitHub",
+    "feedUrl": "https://hellogithub.com/rss",
+    "siteUrl": "https://hellogithub.com",
+    "category": "开源",
+    "description": "分享 GitHub 上有趣的开源项目。",
+    "lang": "zh"
+  },
+  {
+    "title": "优设网",
+    "feedUrl": "https://www.uisdc.com/feed",
+    "siteUrl": "https://www.uisdc.com",
+    "category": "设计",
+    "description": "设计师的学习与灵感分享平台。",
+    "lang": "zh"
+  },
+  {
+    "title": "Anyway.FM 设计杂谈",
+    "feedUrl": "https://anyway.fm/rss.xml",
+    "siteUrl": "https://anyway.fm",
+    "category": "设计",
+    "description": "两位设计师主理的设计播客。",
+    "lang": "zh"
+  },
+  {
+    "title": "Decohack",
+    "feedUrl": "https://www.decohack.com/feed",
+    "siteUrl": "https://www.decohack.com",
+    "category": "设计",
+    "description": "产品设计与独立开发的资讯站。",
+    "lang": "zh"
+  },
+  {
+    "title": "机核 GCORES",
+    "feedUrl": "https://www.gcores.com/rss",
+    "siteUrl": "https://www.gcores.com",
+    "category": "游戏",
+    "description": "不止是游戏的游戏文化社区。",
+    "lang": "zh"
+  },
+  {
+    "title": "游戏研究社",
+    "feedUrl": "https://www.yystv.cn/rss/feed",
+    "siteUrl": "https://www.yystv.cn",
+    "category": "游戏",
+    "description": "深度的游戏文化报道与考据。",
+    "lang": "zh"
+  },
+  {
+    "title": "触乐",
+    "feedUrl": "https://www.chuapp.com/feed",
+    "siteUrl": "https://www.chuapp.com",
+    "category": "游戏",
+    "description": "认真而有趣的游戏报道。",
+    "lang": "zh"
+  },
+  {
+    "title": "雪球今日话题",
+    "feedUrl": "https://xueqiu.com/hots/topic/rss",
+    "siteUrl": "https://xueqiu.com",
+    "category": "商业",
+    "description": "雪球上的热门投资话题与讨论。",
+    "lang": "zh"
+  },
+  {
+    "title": "疯投圈",
+    "feedUrl": "https://crazy.capital/feed",
+    "siteUrl": "https://crazy.capital",
+    "category": "商业",
+    "description": "聊商业与投资的中文播客。",
+    "lang": "zh"
+  },
+  {
+    "title": "知乎每日精选",
+    "feedUrl": "https://www.zhihu.com/rss",
+    "siteUrl": "https://www.zhihu.com",
+    "category": "阅读",
+    "description": "知乎上的热门问答与精选文章。",
+    "lang": "zh"
+  },
+  {
+    "title": "湾区日报",
+    "feedUrl": "https://wanqu.co/feed/",
+    "siteUrl": "https://wanqu.co",
+    "category": "阅读",
+    "description": "每天精选几篇科技与创业好文。",
+    "lang": "zh"
+  },
+  {
+    "title": "潮流周刊",
+    "feedUrl": "https://weekly.tw93.fun/rss.xml",
+    "siteUrl": "https://weekly.tw93.fun",
+    "category": "阅读",
+    "description": "一份关注独立开发与设计的周刊。",
+    "lang": "zh"
+  },
+  {
+    "title": "纽约时报中文网",
+    "feedUrl": "https://cn.nytimes.com/rss/news.xml",
+    "siteUrl": "https://cn.nytimes.com",
+    "category": "新闻",
+    "description": "纽约时报的中文国际新闻报道。",
+    "lang": "zh"
+  },
+  {
+    "title": "华尔街日报中文网",
+    "feedUrl": "https://cn.wsj.com/zh-hans/rss",
+    "siteUrl": "https://cn.wsj.com",
+    "category": "新闻",
+    "description": "华尔街日报的中文财经与时事。",
+    "lang": "zh"
+  },
+  {
+    "title": "JustPod",
+    "feedUrl": "https://justpodnews.com/rss/",
+    "siteUrl": "https://justpodnews.com",
+    "category": "播客",
+    "description": "中文播客内容与行业资讯。",
+    "lang": "zh"
+  },
+  {
+    "title": "はてなブックマーク 人気エントリー",
+    "feedUrl": "https://b.hatena.ne.jp/hotentry.rss",
+    "siteUrl": "https://b.hatena.ne.jp",
+    "category": "テック",
+    "description": "いま話題のエントリーを集めた人気記事。",
+    "lang": "ja"
+  },
+  {
+    "title": "はてなブックマーク テクノロジー",
+    "feedUrl": "https://b.hatena.ne.jp/hotentry/it.rss",
+    "siteUrl": "https://b.hatena.ne.jp/hotentry/it",
+    "category": "テック",
+    "description": "IT・テクノロジー分野の人気エントリー。",
+    "lang": "ja"
+  },
+  {
+    "title": "GIGAZINE",
+    "feedUrl": "https://gigazine.net/news/rss_2.0/",
+    "siteUrl": "https://gigazine.net",
+    "category": "テック",
+    "description": "役立つ情報を毎日発信するニュースサイト。",
+    "lang": "ja"
+  },
+  {
+    "title": "Gizmodo Japan",
+    "feedUrl": "https://www.gizmodo.jp/index.xml",
+    "siteUrl": "https://www.gizmodo.jp",
+    "category": "テック",
+    "description": "ガジェットとテクノロジーを扱うブログ。",
+    "lang": "ja"
+  },
+  {
+    "title": "WIRED.jp",
+    "feedUrl": "https://wired.jp/feed/rss",
+    "siteUrl": "https://wired.jp",
+    "category": "テック",
+    "description": "テクノロジーとカルチャーの未来を伝える。",
+    "lang": "ja"
+  },
+  {
+    "title": "ASCII.jp",
+    "feedUrl": "https://ascii.jp/rss.xml",
+    "siteUrl": "https://ascii.jp",
+    "category": "テック",
+    "description": "PCとデジタル分野の総合ニュース。",
+    "lang": "ja"
+  },
+  {
+    "title": "Publickey",
+    "feedUrl": "https://www.publickey1.jp/atom.xml",
+    "siteUrl": "https://www.publickey1.jp",
+    "category": "プログラミング",
+    "description": "エンタープライズIT技術のニュースと解説。",
+    "lang": "ja"
+  },
+  {
+    "title": "Qiita 人気の記事",
+    "feedUrl": "https://qiita.com/popular-items/feed",
+    "siteUrl": "https://qiita.com",
+    "category": "プログラミング",
+    "description": "エンジニアに人気の技術記事。",
+    "lang": "ja"
+  },
+  {
+    "title": "Zenn",
+    "feedUrl": "https://zenn.dev/feed",
+    "siteUrl": "https://zenn.dev",
+    "category": "プログラミング",
+    "description": "エンジニアのための情報共有コミュニティ。",
+    "lang": "ja"
+  },
+  {
+    "title": "ITmedia NEWS",
+    "feedUrl": "https://rss.itmedia.co.jp/rss/2.0/news_bursts.xml",
+    "siteUrl": "https://www.itmedia.co.jp/news/",
+    "category": "ニュース",
+    "description": "IT・デジタル分野の最新ニュース。",
+    "lang": "ja"
+  },
+  {
+    "title": "NHK ニュース",
+    "feedUrl": "https://www.nhk.or.jp/rss/news/cat0.xml",
+    "siteUrl": "https://www3.nhk.or.jp/news/",
+    "category": "ニュース",
+    "description": "NHKが伝える主要ニュース。",
+    "lang": "ja"
+  },
+  {
+    "title": "Yahoo!ニュース 主要",
+    "feedUrl": "https://news.yahoo.co.jp/rss/topics/top-picks.xml",
+    "siteUrl": "https://news.yahoo.co.jp",
+    "category": "ニュース",
+    "description": "Yahoo!ニュースの主要トピックス。",
+    "lang": "ja"
+  },
+  {
+    "title": "ねとらぼ",
+    "feedUrl": "https://nlab.itmedia.co.jp/rss/2.0/netlab.xml",
+    "siteUrl": "https://nlab.itmedia.co.jp",
+    "category": "ニュース",
+    "description": "ネットの話題やサブカルを扱うニュース。",
+    "lang": "ja"
+  },
+  {
+    "title": "ライフハッカー・ジャパン",
+    "feedUrl": "https://www.lifehacker.jp/feed/index.xml",
+    "siteUrl": "https://www.lifehacker.jp",
+    "category": "ライフスタイル",
+    "description": "仕事と生活をはかどらせるヒント。",
+    "lang": "ja"
+  },
+  {
+    "title": "はてなブックマーク 暮らし",
+    "feedUrl": "https://b.hatena.ne.jp/hotentry/life.rss",
+    "siteUrl": "https://b.hatena.ne.jp/hotentry/life",
+    "category": "ライフスタイル",
+    "description": "暮らしに関する人気エントリー。",
+    "lang": "ja"
+  },
+  {
+    "title": "4Gamer.net",
+    "feedUrl": "https://www.4gamer.net/rss/index.xml",
+    "siteUrl": "https://www.4gamer.net",
+    "category": "ゲーム",
+    "description": "ゲーム業界の最新情報を扱うサイト。",
+    "lang": "ja"
+  },
+  {
+    "title": "はてなブックマーク アニメとゲーム",
+    "feedUrl": "https://b.hatena.ne.jp/hotentry/game.rss",
+    "siteUrl": "https://b.hatena.ne.jp/hotentry/game",
+    "category": "ゲーム",
+    "description": "アニメ・ゲーム分野の人気エントリー。",
+    "lang": "ja"
+  },
+  {
+    "title": "はてなブックマーク おもしろ",
+    "feedUrl": "https://b.hatena.ne.jp/hotentry/fun.rss",
+    "siteUrl": "https://b.hatena.ne.jp/hotentry/fun",
+    "category": "エンタメ",
+    "description": "おもしろ系の人気エントリー。",
+    "lang": "ja"
+  },
+  {
+    "title": "はてなブックマーク 世の中",
+    "feedUrl": "https://b.hatena.ne.jp/hotentry/social.rss",
+    "siteUrl": "https://b.hatena.ne.jp/hotentry/social",
+    "category": "社会",
+    "description": "世の中・社会の話題の人気エントリー。",
+    "lang": "ja"
+  },
+  {
+    "title": "コリス",
+    "feedUrl": "https://coliss.com/feed",
+    "siteUrl": "https://coliss.com",
+    "category": "デザイン",
+    "description": "Web制作とデザインの実用情報。",
+    "lang": "ja"
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "name": "reader",
+  "icon": "dot.radiowaves.up.forward",
+  "color": "rgba(255, 159, 10, 1)",
+  "version": "1.0.0",
+  "runInApp": true,
+  "description": "An RSS reader with home screen widget. Tap the widget to open the app-like reader pages.",
+  "localizedNames": {
+    "zh-Hans": "阅读器"
+  },
+  "localizedDescriptions": {
+    "zh-Hans": "RSS 阅读器，带桌面小组件。点小组件进入 App 式阅读页面。"
+  }
+}
