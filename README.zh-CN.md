@@ -13,6 +13,7 @@
 | [Kimi 额度 (kimi-quota)](./kimi-quota/) | 查询 Kimi Code(Coding Plan)用量额度：支持多账号，App 页 + 桌面小组件，带剩余百分比与重置倒计时。 |
 | [ZCode 远程连接 (zcode-remote)](./zcode-remote/) | ZCode 远程连接启动器：App 内全屏网页 + 浏览器式控制条，桌面小组件显示在线状态、延迟，一键连接设备。 |
 | [RSS 阅读器 (reader)](./reader/) | RSS 阅读器：自研 RSS/Atom 解析（无 DOM）、内置 137 个中英日精选订阅源目录、已读/收藏、全文抓取、深色阅读主题与手势翻页，附最新文章桌面小组件。 |
+| [订阅流量 (submon)](./submon/) | 订阅流量监控：App 内添加/管理订阅，查看流量与到期详情，支持经公共 subconverter 转换订阅，附流量仪表桌面小组件。 |
 
 ## 快速开始
 

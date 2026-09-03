@@ -13,6 +13,7 @@ Scripts and utilities built with the [Scripting](https://apps.apple.com/app/id64
 | [kimi-quota](./kimi-quota/) | Kimi Code (Coding Plan) usage tracker for multiple API keys — app page + home screen widget with per-account remaining %, progress bars and reset countdown. |
 | [zcode-remote](./zcode-remote/) | ZCode remote connection launcher: full-screen in-app web page with browser-style controls, plus a home screen widget showing reachability status, latency and one-tap connect. |
 | [reader](./reader/) | RSS reader: built-in RSS/Atom parsing (no DOM), a curated feed directory (137 feeds, CN/EN/JP), read/star states, full-text fetching, dark reading themes and gesture navigation, plus a home screen widget with the latest articles. |
+| [submon](./submon/) | Subscription traffic monitor: add subscriptions in-app, view traffic usage/expiry details, convert subscription links via public subconverter backends, plus a traffic gauge home-screen widget. |
 
 ## Getting Started
 

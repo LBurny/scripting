@@ -1,0 +1,14 @@
+{
+  "name": "submon",
+  "icon": "gauge.with.needle",
+  "color": "rgba(52, 199, 89, 1)",
+  "version": "1.0.0",
+  "runInApp": true,
+  "description": "Subscription traffic monitor with home screen widget.",
+  "localizedNames": {
+    "zh-Hans": "订阅流量"
+  },
+  "localizedDescriptions": {
+    "zh-Hans": "订阅流量监控：App 内管理订阅，桌面小组件展示用量与到期。"
+  }
+}
