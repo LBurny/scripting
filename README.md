@@ -10,7 +10,7 @@ Scripts and utilities built with the [Scripting](https://apps.apple.com/app/id64
 | ------ | ----------- |
 | [surge-panel](./surge-panel/) | Surge HTTP API monitoring panel: multi-instance overview, policies, traffic, requests, engine settings, plus a live-speed home-screen widget. |
 | [qweather](./qweather/) | QWeather dashboard page + home screen widget (current weather, hourly & 3-day forecast, AQI). Uses your personal QWeather API Host (2026 auth scheme). |
-| [code-credit](./code-credit/) | Code usage tracker for Kimi Code (Coding Plan) and Ollama — multi-account API keys, app page + home screen widget with per-account remaining %, progress bars and reset countdown. |
+| [code-credit](./code-credit/) | Code usage tracker for Kimi Code and Ollama — multi-account API keys, app page + home screen widget with per-account remaining %, progress bars and reset countdown. |
 | [zcode-remote](./zcode-remote/) | ZCode remote connection launcher: full-screen in-app web page with browser-style controls, plus a home screen widget showing reachability status, latency and one-tap connect. |
 | [reader](./reader/) | RSS reader: built-in RSS/Atom parsing (no DOM), a curated feed directory (137 feeds, CN/EN/JP), read/star states, full-text fetching, dark reading themes and gesture navigation, plus a home screen widget with the latest articles. |
 | [submon](./submon/) | Subscription traffic monitor: add subscriptions in-app, view traffic usage/expiry details, convert subscription links via public subconverter backends, plus a traffic gauge home-screen widget. |
