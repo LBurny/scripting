@@ -1,0 +1,27 @@
+{
+  "version" : "1.1.0",
+  "contributors" : [
+
+  ],
+  "permissions" : null,
+  "runInApp" : true,
+  "localizedDescriptions" : {
+    "en" : "Query Kimi Code and Ollama usage quotas",
+    "zh" : "查询 Kimi Code 与 Ollama 的用量额度"
+  },
+  "remoteResource" : null,
+  "entry" : "index.tsx",
+  "intentInputTypes" : [
+
+  ],
+  "color" : "rgba(29, 32, 36, 1)",
+  "name" : "code-credit",
+  "author" : null,
+  "description" : null,
+  "localizedNames" : {
+    "en" : "Code Credit",
+    "zh" : "Code Credit"
+  },
+  "icon" : "gauge",
+  "iconImage" : null
+}
