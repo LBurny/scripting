@@ -1,0 +1,27 @@
+{
+  "version" : "1.0.0",
+  "localizedDescriptions" : {
+    "en" : "Track Command Code credits and rolling 5-hour / weekly usage windows",
+    "zh" : "查看 Command Code 的额度余额与 5 小时/周滚动窗口用量"
+  },
+  "permissions" : null,
+  "runInApp" : true,
+  "icon" : "gauge",
+  "localizedNames" : {
+    "zh" : "Command 额度",
+    "en" : "Command Quota"
+  },
+  "name" : "command-quota",
+  "intentInputTypes" : [
+
+  ],
+  "contributors" : [
+
+  ],
+  "description" : null,
+  "remoteResource" : null,
+  "color" : "rgba(15, 17, 21, 1)",
+  "author" : null,
+  "iconImage" : null,
+  "entry" : "index.tsx"
+}
