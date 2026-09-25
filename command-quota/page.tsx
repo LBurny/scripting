@@ -1,8 +1,24 @@
 // page.tsx — Command 额度 App 页（供 index.tsx 与 preview-page.tsx 复用）
-import { Navigation, NavigationStack, List, Section, VStack, HStack, Text, Image, Button, TextField, Spacer, ProgressView, useState, useEffect } from 'scripting'
-import { Account, Usage, loadAccounts, saveAccounts, fetchQuota, remColor, fmtMoney, fmtTokens, maskKey, resetShort, daysLeft, pad2 } from './core'
+import { Navigation, NavigationStack, List, Section, VStack, HStack, Text, Image, Button, TextField, Spacer, ProgressView, useState, useEffect, Widget } from 'scripting'
+import {
+  Account, Usage, loadAccounts, saveAccounts, fetchQuota, remColor, fmtMoney, fmtTokens, maskKey,
+  resetShort, daysLeft, pad2, loadWidgetCache, saveWidgetCache, toCached, emptyCached, hintOf,
+  usableCache, cacheFor, cacheDiffers, CachedState,
+} from './core'
 
 interface AcctState { acc: Account; usage: Usage | null }
+
+/* 把 App 页取到的数据同步进小组件快照缓存：桌面卡片下次渲染既有新鲜兜底数据，
+   也拿到 orgId/周期提示（少查一次 whoami，一轮就能取完）。失败账号保留旧快照。 */
+function syncWidgetCache(accs: Account[], us: (Usage | null)[]) {
+  const cache = loadWidgetCache()
+  saveWidgetCache(accs.map((a, i) => {
+    const prev = usableCache(cacheFor(cache, a.name, i))
+    const u = us[i]
+    if (!u || u.error) return prev ?? emptyCached(a.name)
+    return toCached(a.name, u, prev)
+  }))
+}
 
 export function UsageRow({ label, pct, reset }: { label: string; pct: number; reset?: string }) {
   const c = remColor(pct)
@@ -87,9 +103,16 @@ export function Page() {
     if (!accs.length) { setLoading(false); return }
     setLoading(true)
     setNow(Date.now())
-    const us = await Promise.all(accs.map(a => fetchQuota(a.key)))
+    const cache = loadWidgetCache()
+    // 带上缓存里的 orgId/周期提示：credits/subs/summary 一轮并行拿到（原串行三段要 8–20s）
+    const us = await Promise.all(accs.map((a, i) =>
+      fetchQuota(a.key, { hint: hintOf(usableCache(cacheFor(cache, a.name, i))) })))
     setStates(us.map((u, i) => ({ acc: accs[i], usage: u })))
+    const changed = us.some((u, i) => cacheDiffers(usableCache(cacheFor(cache, accs[i].name, i)), u))
     if (us.some(x => !x.error)) markTime()
+    syncWidgetCache(accs, us)
+    // 数据确实变了才让系统重绘桌面卡片（避免无意义的频繁刷新）
+    if (changed) { try { Widget.reloadAll() } catch {} }
     setLoading(false)
   }
 
@@ -115,6 +138,8 @@ export function Page() {
       })
       if (!u.error) markTime()
       setLoading(false)
+      syncWidgetCache(list, list.map((_, j) => (j === list.length - 1 ? u : null)))
+      if (!u.error) { try { Widget.reloadAll() } catch {} }
     }).catch(() => setLoading(false))
   }
 
@@ -123,11 +148,13 @@ export function Page() {
     saveAccounts(list)
     setAccounts(list)
     setStates(prev => (prev || []).filter((_, j) => j !== i))
+    syncWidgetCache(list, list.map(() => null))
   }
 
   function doClear() {
     saveAccounts([])
     setAccounts([]); setStates([]); setErr(""); setNewKey(""); setNewName(""); setUpdatedAt("")
+    try { saveWidgetCache([]) } catch {}
   }
 
   return (

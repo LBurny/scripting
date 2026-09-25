@@ -1,6 +1,6 @@
 // widget-ui.tsx — 小组件纯组件（供 widget.tsx 与 preview-widget.tsx 复用）
 import { VStack, HStack, Text, Image, Spacer, ProgressView } from 'scripting'
-import { Win, fmtMoney, fmtTokens, remRGB, resetShort, countdown } from './core'
+import { WidgetState, Win, fmtMoney, fmtTokens, remRGB, resetShort, agoText, clockText } from './core'
 
 /* 小字颜色：浅色统一 #6C6C70，深色统一 #8A8A8F（均稍提高辨识度） */
 const TXT_SUB: any = { light: "#6C6C70", dark: "#8A8A8F" }
@@ -8,20 +8,7 @@ const TXT_MUTED: any = { light: "#6C6C70", dark: "#8A8A8F" }
 /* 徽标底色：与 ollama-quota 完全一致（深灰方底 + 白色 SF Symbol） */
 const BADGE_BG = "rgba(28,30,35,1)"
 
-export interface WState {
-  name: string
-  plan: string
-  five: Win | null
-  weekly: Win | null
-  totalRemaining: number
-  monthlyRemaining: number
-  extraRemaining: number
-  usagePct: number
-  requests: number
-  tokens: number
-  totalSpent: number
-  error: string
-}
+export interface WState extends WidgetState {}
 
 /* 标题：固定显示品牌名（与 ollama 组件一致，不再拼账号别名/套餐） */
 function titleOf(_st: WState): string {
@@ -75,6 +62,22 @@ function remainLine(w: Win | null): string {
   return `剩 ${Math.max(0, 100 - w.pct).toFixed(0)}%`
 }
 
+/* 页脚：重置倒计时 + **数据时刻**。新鲜 = 「更新 11:05」，回退快照 = 「缓存 3小时前」
+   compact（小尺寸宽度有限）：陈旧时只报「缓存 X 前」，不挤倒计时 */
+function footText(w: Win | null, st: WState, compact?: boolean): string {
+  if (compact && st.stale) return `缓存 ${agoText(st.dataAt)}`
+  const parts: string[] = []
+  const rs = resetShort(w)
+  if (rs) parts.push(rs)
+  if (!compact) parts.push(st.stale ? `缓存 ${agoText(st.dataAt)}` : `更新 ${clockText(st.dataAt)}`)
+  return parts.join(" · ")
+}
+
+/* 数据来自旧快照时的标记（与页脚时刻互补：一眼能看出不是刚取的数据） */
+function StaleTag() {
+  return <Text font="caption2" foregroundStyle="systemOrange" fontWeight="semibold" lineLimit={1}>缓存</Text>
+}
+
 /* 单账号(小尺寸):周额度剩余大字 + 5小时/余额/请求量/倒计时 */
 export function SmallSingle({ st }: { st: WState }) {
   const rem = mainRem(st)
@@ -87,6 +90,7 @@ export function SmallSingle({ st }: { st: WState }) {
         <Badge size={18} icon="gauge" />
         <Spacer />
         <Text font="caption2" foregroundStyle={TXT_MUTED} lineLimit={1}>{titleOf(st)}</Text>
+        {st.stale ? <StaleTag /> : null}
       </HStack>
       <Spacer minLength={0} />
       <HStack alignment="firstTextBaseline" spacing={1} frame={{ maxWidth: "infinity", alignment: "center" }}>
@@ -103,11 +107,9 @@ export function SmallSingle({ st }: { st: WState }) {
         <Spacer />
         <Text font="caption2" foregroundStyle={TXT_MUTED} lineLimit={1}>{fmtMoney(st.totalRemaining)}</Text>
       </HStack>
-      {w ? (
-        <Text font="caption2" foregroundStyle={TXT_MUTED} lineLimit={1} minScaleFactor={0.8} frame={{ maxWidth: "infinity", alignment: "leading" }}>
-          {resetShort(w)}
-        </Text>
-      ) : null}
+      <Text font="caption2" foregroundStyle={TXT_MUTED} lineLimit={1} minScaleFactor={0.8} frame={{ maxWidth: "infinity", alignment: "leading" }}>
+        {footText(w, st, true)}
+      </Text>
     </VStack>
   )
 }
@@ -116,6 +118,9 @@ export function SmallSingle({ st }: { st: WState }) {
 export function SmallDual({ states }: { states: WState[] }) {
   const list = states.slice(0, 2)
   const w0 = mainWin(list[0])
+  // 任一列是旧快照时，页脚改报最旧那份的年龄
+  const anyStale = list.some(s => s.stale)
+  const oldest = list.reduce((m, s) => Math.min(m, s.dataAt), list[0].dataAt)
   return (
     <VStack spacing={4} frame={{ maxWidth: "infinity", maxHeight: "infinity" }} padding={{ horizontal: 12, vertical: 11 }}>
       <HStack frame={{ maxWidth: "infinity" }} alignment="center">
@@ -149,7 +154,7 @@ export function SmallDual({ states }: { states: WState[] }) {
       </HStack>
       <Spacer minLength={0} />
       <Text font="caption2" foregroundStyle={TXT_MUTED} frame={{ maxWidth: "infinity", alignment: "center" }} lineLimit={1} minScaleFactor={0.8}>
-        {w0 && w0.resetAt ? `${countdown(Date.now(), w0.resetAt)} 后重置` : ""}
+        {anyStale ? `缓存 ${agoText(oldest)}` : footText(w0, list[0], true)}
       </Text>
     </VStack>
   )
@@ -199,16 +204,10 @@ function AcctCol({ st, withDivider }: { st: WState; withDivider: boolean }) {
             <WinRow label="周额度" w={st.weekly} compact />
           </VStack>
         )}
-        {w ? <Text font="caption2" foregroundStyle={TXT_MUTED} lineLimit={1} minScaleFactor={0.8}>{resetShort(w)}</Text> : null}
+        {w ? <Text font="caption2" foregroundStyle={TXT_MUTED} lineLimit={1} minScaleFactor={0.8}>{footText(w, st)}</Text> : null}
       </VStack>
     </HStack>
   )
-}
-
-function nowHM(): string {
-  const d = new Date()
-  const p = (n: number) => (n < 10 ? `0${n}` : `${n}`)
-  return `${p(d.getHours())}:${p(d.getMinutes())}`
 }
 
 /* 统计行（大尺寸单账号展开） */
@@ -225,17 +224,18 @@ function StatRow({ label, value }: { label: string; value: string }) {
 /* 单账号(中/大尺寸):全宽双窗口 + 底部统计行，expanded 时附本周期明细 */
 export function SingleW({ st, expanded }: { st: WState; expanded?: boolean }) {
   const w = mainWin(st)
-  const foot: string[] = []
-  if (w) foot.push(resetShort(w))
-  foot.push(`更新 ${nowHM()}`)
+  const foot = footText(w, st)
   // ollama 在 footer 上方有一行模型明细小字；Command 无模型维度，同位置换成同周期用量汇总
-  const usageLine = expanded ? "" : `本周期 ${st.requests} 次 · ${fmtTokens(st.tokens)} tokens · ${fmtMoney(st.totalSpent)}`
+  const usageLine = expanded ? "" : st.summaryOk
+    ? `本周期 ${st.requests} 次 · ${fmtTokens(st.tokens)} tokens · ${fmtMoney(st.totalSpent)}`
+    : "本周期数据暂不可用"
   return (
     <VStack spacing={9} frame={{ maxWidth: "infinity", maxHeight: "infinity" }} padding={{ horizontal: 14, vertical: 10 }}>
       <HStack frame={{ maxWidth: "infinity" }} alignment="center">
         <HStack spacing={5} alignment="center">
           <Badge size={18} icon="gauge" />
           <Text font={11} foregroundStyle="label" fontWeight="bold" lineLimit={1}>{titleOf(st)}</Text>
+          {st.stale ? <StaleTag /> : null}
         </HStack>
         <Spacer />
         <Text font="caption2" foregroundStyle={TXT_MUTED} monospacedDigit>{`余额 ${fmtMoney(st.totalRemaining)}`}</Text>
@@ -252,9 +252,9 @@ export function SingleW({ st, expanded }: { st: WState; expanded?: boolean }) {
         <VStack spacing={7} frame={{ maxWidth: "infinity", alignment: "leading" }}>
           <StatRow label="订阅月额度剩余" value={fmtMoney(st.monthlyRemaining)} />
           <StatRow label="额外额度剩余" value={fmtMoney(st.extraRemaining)} />
-          <StatRow label="本周期花费" value={fmtMoney(st.totalSpent)} />
-          <StatRow label="本周期请求" value={`${st.requests} 次`} />
-          <StatRow label="本周期 Token" value={fmtTokens(st.tokens)} />
+          <StatRow label="本周期花费" value={st.summaryOk ? fmtMoney(st.totalSpent) : "—"} />
+          <StatRow label="本周期请求" value={st.summaryOk ? `${st.requests} 次` : "—"} />
+          <StatRow label="本周期 Token" value={st.summaryOk ? fmtTokens(st.tokens) : "—"} />
         </VStack>
       ) : null}
       <Spacer minLength={0} />
@@ -265,7 +265,7 @@ export function SingleW({ st, expanded }: { st: WState; expanded?: boolean }) {
           </Text>
         ) : null}
         <Text font="caption2" foregroundStyle={TXT_MUTED} lineLimit={1} frame={{ maxWidth: "infinity", alignment: "leading" }}>
-          {foot.join(" · ")}
+          {foot}
         </Text>
       </VStack>
     </VStack>

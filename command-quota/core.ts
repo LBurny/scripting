@@ -126,6 +126,12 @@ export interface Usage {
   tokensOut: number
   userName: string
   orgName: string
+  /** 已知组织（null = 无组织）——带上它就能跳过 whoami，把请求压进一轮 */
+  orgId: string | null
+  /** 当前计费周期起点字符串（summary 的 since） */
+  periodStart: string | null
+  /** 本周期汇总（请求/token/花费）是否取到 */
+  summaryOk: boolean
   error: string
 }
 
@@ -136,7 +142,7 @@ function emptyUsage(error: string): Usage {
     monthlyRemaining: 0, extraRemaining: 0, totalRemaining: 0,
     totalSpent: 0, totalPool: 0, usagePct: 0,
     requests: 0, tokens: 0, tokensIn: 0, tokensOut: 0,
-    userName: "", orgName: "", error,
+    userName: "", orgName: "", orgId: null, periodStart: null, summaryOk: false, error,
   }
 }
 
@@ -184,6 +190,11 @@ export function parseQuota(whoami: any, credits: any, subs: any, summary: any): 
     : out.totalSpent + out.totalRemaining
   out.usagePct = out.totalPool > 0 ? round1(Math.max(0, Math.min(100, ((out.totalPool - out.totalRemaining) / out.totalPool) * 100))) : 0
 
+  // 缓存提示用：已知组织 / 当前计费周期起点 / 汇总是否到手
+  out.orgId = whoami?.org?.id ? String(whoami.org.id) : null
+  out.periodStart = sub?.currentPeriodStart ? String(sub.currentPeriodStart) : null
+  out.summaryOk = !!summary && typeof summary === "object"
+
   if (!out.five && !out.weekly && !cr) out.error = "未解析到用量数据"
   return out
 }
@@ -209,6 +220,16 @@ export function clockText(ts: number | null, nowMs = Date.now()): string {
   const hm = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`
   const same = new Date(nowMs).toDateString() === d.toDateString()
   return same ? hm : `${d.getMonth() + 1}/${d.getDate()} ${hm}`
+}
+
+/** 相对时间：刚刚 / 12分钟前 / 3小时前 / 2天前（组件用它标注缓存数据有多旧） */
+export function agoText(ts: number, nowMs = Date.now()): string {
+  const min = Math.floor(Math.max(0, nowMs - ts) / 60000)
+  if (min < 1) return "刚刚"
+  if (min < 60) return `${min}分钟前`
+  const h = Math.floor(min / 60)
+  if (h < 24) return `${h}小时前`
+  return `${Math.floor(h / 24)}天前`
 }
 
 /** 「3小时12分 后重置 (15:23)」 */
@@ -304,30 +325,116 @@ export async function fetchWhoami(key: string): Promise<Whoami> {
   }
 }
 
-/** 一次拉取完整额度信息（whoami → 订阅/额度 → 本周期汇总） */
-export async function fetchQuota(key: string): Promise<Usage> {
+/** 组织查询串（纯函数，便于测试） */
+export function orgQuery(orgId: string | null | undefined): string {
+  return orgId ? `orgId=${encodeURIComponent(orgId)}` : ""
+}
+
+/** since = 当前计费周期起点，summary 用它统计「本周期」 */
+export function sinceQuery(since: string | null | undefined): string {
+  return since ? `since=${encodeURIComponent(since)}` : ""
+}
+
+export function queryString(...parts: string[]): string {
+  const q = parts.filter(p => !!p).join("&")
+  return q ? `?${q}` : ""
+}
+
+export interface FetchHint {
+  /** undefined = 未知（老缓存，需走完整路径）；null = 已知无组织 */
+  orgId?: string | null
+  periodStart?: string | null
+  userName?: string
+  orgName?: string
+}
+
+export interface FetchOptions {
+  hint?: FetchHint | null
+  /** 首轮没拿到本周期汇总时是否再补一轮（App 页可，小组件预算内传 false） */
+  followUpSummary?: boolean
+}
+
+/** 单请求结果：不抛错，让一轮并行里的各请求独立成败 */
+interface Settled<T> { ok: boolean; v: T | null; error: string }
+
+async function settle<T>(p: Promise<T>): Promise<Settled<T>> {
   try {
-    const who = await fetchWhoami(key)
-    const org = who.orgId ? `&orgId=${encodeURIComponent(who.orgId)}` : ""
-    const [subs, credits] = await Promise.all([
-      getJson(key, `/alpha/billing/subscriptions${org ? `?${org.slice(1)}` : ""}`),
-      getJson(key, `/alpha/billing/credits${org ? `?${org.slice(1)}` : ""}`),
+    return { ok: true, v: await p, error: "" }
+  } catch (e: any) {
+    return { ok: false, v: null, error: String(e?.message || e || "请求失败") }
+  }
+}
+
+function okSettled<T>(v: T | null): Settled<T> { return { ok: true, v, error: "" } }
+
+/** 网络/接口错误统一文案（apiError 已自带括号，原样透出） */
+function asError(msg: string): string {
+  return msg.startsWith("接口") || msg.includes("(") ? msg : `网络请求失败：${msg}`
+}
+
+/**
+ * 拉取完整额度信息。
+ * 带 orgId 提示时跳过 whoami，把 credits / subs / summary 放进**同一轮并行**：
+ * 这几个接口单次就要 2.4–5.1s，只有压成一轮才可能落在小组件的几秒预算内
+ * （原来的 whoami → subs/credits → summary 串行三段实测 8–20s，组件必然超时回退旧缓存）。
+ */
+export async function fetchQuota(key: string, opts: FetchOptions = {}): Promise<Usage> {
+  const hint = opts.hint ?? null
+  const followUp = opts.followUpSummary !== false
+  const knownOrg = !!hint && hint.orgId !== undefined
+  try {
+    let orgId: string | null = knownOrg ? hint!.orgId ?? null : null
+    const sinceHint: string | null = knownOrg ? hint!.periodStart ?? null : null
+
+    const round = (withSummary: boolean) => Promise.all([
+      knownOrg ? Promise.resolve(okSettled<Whoami>(null)) : settle(fetchWhoami(key)),
+      settle(getJson(key, `/alpha/billing/credits${queryString(orgQuery(orgId))}`)),
+      settle(getJson(key, `/alpha/billing/subscriptions${queryString(orgQuery(orgId))}`)),
+      withSummary && sinceHint
+        ? settle(getJson(key, `/alpha/usage/summary${queryString(orgQuery(orgId), sinceQuery(sinceHint))}`))
+        : Promise.resolve(okSettled<any>(null)),
     ])
-    const since = subs?.data?.currentPeriodStart ? String(subs.data.currentPeriodStart) : null
-    let summary: any = null
-    try {
-      const q = `${org ? org.slice(1) : ""}${since ? `${org ? "&" : ""}since=${encodeURIComponent(since)}` : ""}`
-      summary = await getJson(key, `/alpha/usage/summary${q ? `?${q}` : ""}`)
-    } catch {
-      summary = null
+
+    let [who, cr, sb, sm] = await round(true)
+    let summaryOk = !!sm.v
+
+    // 无提示时首轮并不知道组织：账号属于某组织时首轮作用域不对，需按 orgId 重取
+    if (!knownOrg) {
+      if (!who.ok || !who.v) throw new Error(who.error || "whoami 请求失败")
+      orgId = who.v.orgId
+      if (orgId) {
+        const again = await Promise.all([
+          settle(getJson(key, `/alpha/billing/credits${queryString(orgQuery(orgId))}`)),
+          settle(getJson(key, `/alpha/billing/subscriptions${queryString(orgQuery(orgId))}`)),
+        ])
+        cr = again[0]
+        sb = again[1]
+      }
     }
-    const u = parseQuota(null, credits, subs, summary)
-    u.userName = who.userName
-    u.orgName = who.orgId ? who.orgName : ""
+
+    const subSince = sb.v?.data?.currentPeriodStart ? String(sb.v.data.currentPeriodStart) : null
+    // 提示里的周期已过（换月）：本轮汇总统计的是旧周期，作废以免显示上一周期数字
+    if (summaryOk && sinceHint && subSince && sinceHint !== subSince) {
+      sm = okSettled<any>(null)
+      summaryOk = false
+    }
+
+    if (!summaryOk && followUp && subSince) {
+      const r = await settle(getJson(key, `/alpha/usage/summary${queryString(orgQuery(orgId), sinceQuery(subSince))}`))
+      if (r.ok && r.v) { sm = r; summaryOk = true }
+    }
+
+    if (!cr.ok || !cr.v) throw new Error(cr.error || "额度接口未返回数据")
+
+    const u = parseQuota(who.v, cr.v, sb.v, sm.v)
+    u.orgId = orgId
+    u.periodStart = subSince
+    u.summaryOk = summaryOk
+    u.userName = knownOrg ? hint!.userName ?? "" : who.v?.userName ?? ""
+    u.orgName = knownOrg ? hint!.orgName ?? "" : orgId ? who.v?.orgName ?? "" : ""
     return u
   } catch (e: any) {
-    const msg = String(e?.message || e || "未知错误")
-    return emptyUsage(msg.startsWith("接口") || msg.includes("(") ? msg : `网络请求失败：${msg}`)
+    return emptyUsage(asError(String(e?.message || e || "未知错误")))
   }
 }
 
@@ -346,7 +453,14 @@ export interface CachedState {
   requests: number
   tokens: number
   totalSpent: number
+  /** 取数时刻（ms）：只在真正取到新数据时前移，回退显示时界面靠它标注「缓存 X 前」 */
   ts: number
+  /** 已知组织（null = 无组织）；老缓存无此字段 → undefined，下轮走完整路径补齐 */
+  orgId?: string | null
+  /** 当前计费周期起点（summary 的 since 提示） */
+  periodStart?: string | null
+  userName?: string
+  orgName?: string
 }
 
 export function loadWidgetCache(): CachedState[] {
@@ -364,11 +478,97 @@ export function saveWidgetCache(states: CachedState[]): void {
   try { Storage.set(KEY_CACHE, JSON.stringify(states)) } catch {}
 }
 
-export function toCached(name: string, u: Usage): CachedState {
+/** 账号对应的缓存条目：先按位置匹配（账号顺序一般不变），再按名字兜底 */
+export function cacheFor(cache: CachedState[], name: string, i: number): CachedState | null {
+  const byIdx = cache[i]
+  if (byIdx && byIdx.name === name) return byIdx
+  return cache.find(c => c.name === name) ?? null
+}
+
+/** 可用快照：必须有取数时刻（ts=0 是占位空条目） */
+export function usableCache(c: CachedState | null | undefined): CachedState | null {
+  return c && c.ts ? c : null
+}
+
+/** 空占位条目：保持数组位置稳定（usableCache 会忽略 ts=0 的条目） */
+export function emptyCached(name: string): CachedState {
+  return {
+    name, plan: "", five: null, weekly: null, totalRemaining: 0, monthlyRemaining: 0,
+    extraRemaining: 0, usagePct: 0, requests: 0, tokens: 0, totalSpent: 0, ts: 0,
+  }
+}
+
+/** 缓存里的查询提示；老缓存无 orgId → null（走完整路径，拿到后即补齐） */
+export function hintOf(c: CachedState | null | undefined): FetchHint | null {
+  if (!c || c.orgId === undefined) return null
+  return { orgId: c.orgId ?? null, periodStart: c.periodStart ?? null, userName: c.userName, orgName: c.orgName }
+}
+
+/** 取到新数据后写缓存；本轮没拿到本周期汇总时沿用旧数字，避免把 0 写进去 */
+export function toCached(name: string, u: Usage, prev?: CachedState | null, now = Date.now()): CachedState {
+  const keep = !u.summaryOk && !!prev
+  const p = prev ?? null
+  return {
+    name, plan: u.plan || p?.plan || "", five: u.five, weekly: u.weekly,
+    totalRemaining: u.totalRemaining, monthlyRemaining: u.monthlyRemaining,
+    extraRemaining: u.extraRemaining, usagePct: u.usagePct,
+    requests: keep && p ? p.requests : u.requests,
+    tokens: keep && p ? p.tokens : u.tokens,
+    totalSpent: keep && p ? p.totalSpent : u.totalSpent,
+    orgId: u.orgId, periodStart: u.periodStart, userName: u.userName, orgName: u.orgName,
+    ts: now,
+  }
+}
+
+/** 与快照相比展示数据是否有变化（决定要不要通知系统重绘组件） */
+export function cacheDiffers(c: CachedState | null | undefined, u: Usage): boolean {
+  if (u.error) return false
+  if (!c || !c.ts) return true
+  return c.requests !== u.requests || c.totalSpent !== u.totalSpent || c.totalRemaining !== u.totalRemaining
+    || (c.five ? c.five.pct : null) !== (u.five ? u.five.pct : null)
+    || (c.weekly ? c.weekly.pct : null) !== (u.weekly ? u.weekly.pct : null)
+}
+
+// ---- 组件状态：由 Usage / 缓存快照构造，并标注数据新鲜度 ----
+export interface WidgetState {
+  name: string
+  plan: string
+  five: Win | null
+  weekly: Win | null
+  totalRemaining: number
+  monthlyRemaining: number
+  extraRemaining: number
+  usagePct: number
+  requests: number
+  tokens: number
+  totalSpent: number
+  error: string
+  /** 整卡数据来自缓存快照（本轮没取到） */
+  stale: boolean
+  /** 本周期汇总可用（否则显示「本周期数据暂不可用」而不是 0） */
+  summaryOk: boolean
+  /** 显示数据的取数时刻（ms）：新鲜 = 本次，缓存 = 快照时刻 */
+  dataAt: number
+}
+
+/** 本轮取到数据：直接展示 */
+export function fromUsageState(name: string, u: Usage, now = Date.now()): WidgetState {
   return {
     name, plan: u.plan, five: u.five, weekly: u.weekly,
     totalRemaining: u.totalRemaining, monthlyRemaining: u.monthlyRemaining,
     extraRemaining: u.extraRemaining, usagePct: u.usagePct,
-    requests: u.requests, tokens: u.tokens, totalSpent: u.totalSpent, ts: Date.now(),
+    requests: u.requests, tokens: u.tokens, totalSpent: u.totalSpent,
+    error: u.error, stale: false, summaryOk: u.summaryOk, dataAt: now,
+  }
+}
+
+/** 回退显示上次成功快照：带上快照时刻，界面据此标注「缓存 X 前」 */
+export function fromCachedState(c: CachedState): WidgetState {
+  return {
+    name: c.name, plan: c.plan, five: c.five, weekly: c.weekly,
+    totalRemaining: c.totalRemaining, monthlyRemaining: c.monthlyRemaining,
+    extraRemaining: c.extraRemaining, usagePct: c.usagePct,
+    requests: c.requests, tokens: c.tokens, totalSpent: c.totalSpent,
+    error: "", stale: true, summaryOk: true, dataAt: c.ts,
   }
 }
