@@ -36,6 +36,45 @@ const D = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"]
 function getApiKey(): string { return Storage.get<string>("qweather_api_key") || "" }
 function getHost(): string { return (Storage.get<string>("qweather_api_host") || "").trim().replace(/^https?:\/\//i, "").replace(/\/.*$/, "") }
 
+// 带超时的 await：组件里 fetch 无超时，超预算会被系统杀掉，必须自己兜底
+function T<T>(p: Promise<T>, ms: number, fb: T): Promise<T> {
+  return new Promise<T>((resolve) => {
+    let done = false
+    const timer = setTimeout(() => {
+      if (done) return
+      done = true
+      resolve(fb)
+    }, ms)
+    p.then((v) => {
+      if (done) return
+      done = true
+      clearTimeout(timer)
+      resolve(v)
+    }).catch(() => {
+      if (done) return
+      done = true
+      clearTimeout(timer)
+      resolve(fb)
+    })
+  })
+}
+
+const CACHE = "qweather_widget_cache_v1"
+
+function saveCache(d: AD) {
+  try { Storage.set(CACHE, JSON.stringify(d)) } catch {}
+}
+
+function loadCache(): AD | null {
+  try {
+    const s = Storage.get<string>(CACHE)
+    if (!s) return null
+    const d = JSON.parse(s)
+    if (d && d.now && d.daily && d.daily.length) return d as AD
+  } catch {}
+  return null
+}
+
 function getLunarDate(): string {
   try {
     const df = new Intl.DateTimeFormat('zh-CN', { calendar: 'chinese', month: 'long', day: 'numeric' })
@@ -72,19 +111,25 @@ function getAlmanac(): string {
 }
 
 async function gl(): Promise<{ s: string; lat: number; long: number } | null> {
-  try { await Location.setAccuracy("best"); const l = await Location.requestCurrent({ forceRequest: false }); if (l) return { s: `${l.longitude.toFixed(4)},${l.latitude.toFixed(4)}`, lat: l.latitude, long: l.longitude }; return null } catch { return null }
+  try {
+    await T(Location.setAccuracy("best"), 500, undefined as any)
+    const l = await T(Location.requestCurrent({ forceRequest: false }), 1500, null)
+    if (l) return { s: `${l.longitude.toFixed(4)},${l.latitude.toFixed(4)}`, lat: l.latitude, long: l.longitude }
+    return null
+  } catch { return null }
 }
 async function fc(l: string, k: string, host: string): Promise<string> {
-  try { const r = await fetch(`https://${host}/geo/v2/city/lookup?location=${l}`, { headers: { "X-QW-Api-Key": k } }); const d = await r.json(); if (d.code === "200" && d.location?.length) return d.location[0].name } catch {} return ""
+  try { const r = await T(fetch(`https://${host}/geo/v2/city/lookup?location=${l}`, { headers: { "X-QW-Api-Key": k } }), 1600, null as any); if (!r) return ""; const d = await T(r.json(), 800, null as any); if (d && d.code === "200" && d.location?.length) return d.location[0].name } catch {} return ""
 }
 async function rg(lat: number, long: number): Promise<{ d: string; s: string }> {
-  try { const pm = await Location.reverseGeocode({ latitude: lat, longitude: long }); if (pm?.length) return { d: pm[0].subLocality || pm[0].locality || "", s: pm[0].name || "" } } catch {} return { d: "", s: "" }
+  try { const pm = await T(Location.reverseGeocode({ latitude: lat, longitude: long }), 1000, null as any); if (pm?.length) return { d: pm[0].subLocality || pm[0].locality || "", s: pm[0].name || "" } } catch {} return { d: "", s: "" }
 }
 async function fa(host: string, lat: number, lon: number, k: string): Promise<AQ | null> {
   try {
-    const r = await fetch(`https://${host}/airquality/v1/current/${lat.toFixed(2)}/${lon.toFixed(2)}`, { headers: { "X-QW-Api-Key": k } })
-    const d = await r.json()
-    const x = (d.indexes || []).find((i: any) => i.code === "cn-mee") || (d.indexes || [])[0]
+    const r = await T(fetch(`https://${host}/airquality/v1/current/${lat.toFixed(2)}/${lon.toFixed(2)}`, { headers: { "X-QW-Api-Key": k } }), 2000, null as any)
+    if (!r) return null
+    const d = await T(r.json(), 800, null as any)
+    const x = (d?.indexes || []).find((i: any) => i.code === "cn-mee") || (d?.indexes || [])[0]
     if (!x) return null
     const c = x.color
     return { aqi: String(x.aqiDisplay ?? x.aqi ?? ""), level: String(x.level || ""), category: x.category || "", primary: (x.primaryPollutant && x.primaryPollutant.name) || "", pm2p5: "", pm10: "", color: c ? `rgba(${c.red},${c.green},${c.blue},1)` : "" }
@@ -96,19 +141,22 @@ async function fw(loc: string, lat: number, long: number, key: string, host: str
     const base = `https://${host}`
     const oh = { headers: { "X-QW-Api-Key": key } }
     const [nr, fr, hr, ar, wr] = await Promise.all([
-      fetch(`${base}/v7/weather/now?location=${loc}`, oh),
-      fetch(`${base}/v7/weather/7d?location=${loc}`, oh),
-      fetch(`${base}/v7/weather/24h?location=${loc}`, oh),
+      T(fetch(`${base}/v7/weather/now?location=${loc}`, oh), 2500, null as any),
+      T(fetch(`${base}/v7/weather/7d?location=${loc}`, oh), 2200, null as any),
+      T(fetch(`${base}/v7/weather/24h?location=${loc}`, oh), 2200, null as any),
       fa(host, lat, long, key),
-      fetch(`${base}/v7/warning/now?location=${loc}`, oh),
+      T(fetch(`${base}/v7/warning/now?location=${loc}`, oh), 1800, null as any),
     ])
-    const nd = await nr.json(), fd = await fr.json(), hd = await hr.json(), wd = await wr.json()
-    if (nd.code !== "200" || fd.code !== "200") return null
-    const city = await fc(loc, key, host) || "当前位置"
+    const nd = nr ? await T(nr.json(), 800, null as any) : null
+    if (!nd || nd.code !== "200") return null
+    const fd = fr ? await T(fr.json(), 800, null as any) : null
+    if (!fd || fd.code !== "200") return null
+    const hd = hr ? await T(hr.json(), 800, null as any) : null
+    const wd = wr ? await T(wr.json(), 800, null as any) : null
     const aqi = ar
-    const warn = wd.code === "200" && Array.isArray(wd.warning) ? wd.warning.slice(0, 2).map((w: any) => ({ title: w.title || "", severity: w.severity || "", text: w.text || "" })) : []
-    const hourly = hd.code === "200" && Array.isArray(hd.hourly) ? hd.hourly.slice(0, 8).map((h: any) => ({ fxTime: h.fxTime, temp: h.temp, icon: h.icon, text: h.text, precip: h.precip || "0" })) : []
-    return { now: nd.now, daily: fd.daily || [], hourly, city, aqi, warn }
+    const warn = wd && wd.code === "200" && Array.isArray(wd.warning) ? wd.warning.slice(0, 2).map((w: any) => ({ title: w.title || "", severity: w.severity || "", text: w.text || "" })) : []
+    const hourly = hd && hd.code === "200" && Array.isArray(hd.hourly) ? hd.hourly.slice(0, 8).map((h: any) => ({ fxTime: h.fxTime, temp: h.temp, icon: h.icon, text: h.text, precip: h.precip || "0" })) : []
+    return { now: nd.now, daily: fd.daily || [], hourly, city: "", aqi, warn }
   } catch { return null }
 }
 
@@ -308,39 +356,67 @@ function WV({ d }: { d: AD }) {
   )
 }
 
-async function main() {
+function errView(symbol: string, text: string, color: string) {
+  return (
+    <VStack spacing={8} alignment="center" frame={{ maxWidth: "infinity", maxHeight: "infinity" }} padding={20}>
+      <Image systemName={symbol} frame={{ width: 36, height: 36 }} foregroundStyle={color as any} />
+      <Text font="body" foregroundStyle="secondaryLabel" frame={{ maxWidth: "infinity", alignment: "center" }}>{text}</Text>
+    </VStack>
+  )
+}
+
+async function build(): Promise<{ d: AD } | { e: string }> {
   const key = getApiKey()
   const host = getHost()
-  if (!key || !host) {
-    const miss = !key ? "缺少 API Key" : "缺少 API Host"
-    Widget.present(<VStack spacing={8} alignment="center" frame={{ maxWidth: "infinity", maxHeight: "infinity" }} padding={20}>
-      <Image systemName="key.fill" frame={{ width: 36, height: 36 }} foregroundStyle="systemOrange" />
-      <Text font="body" foregroundStyle="secondaryLabel" frame={{ maxWidth: "infinity", alignment: "center" }}>{miss}，请打开 App 配置</Text>
-    </VStack>)
-    return
-  }
+  if (!key || !host) return { e: !key ? "missing-key" : "missing-host" }
   const loc = await gl()
-  if (!loc) {
-    Widget.present(<VStack spacing={8} alignment="center" frame={{ maxWidth: "infinity", maxHeight: "infinity" }} padding={20}>
-      <Image systemName="location.slash.fill" frame={{ width: 36, height: 36 }} foregroundStyle="systemRed" />
-      <Text font="body" foregroundStyle="secondaryLabel" frame={{ maxWidth: "infinity", alignment: "center" }}>无法获取位置</Text>
-    </VStack>)
-    return
+  if (!loc) return { e: "no-location" }
+  // 三个请求（天气/城市名/反向地理）并行，把总耗时压到单次请求量级
+  const [w, cityName, geo] = await Promise.all([
+    fw(loc.s, loc.lat, loc.long, key, host),
+    fc(loc.s, key, host),
+    rg(loc.lat, loc.long),
+  ])
+  if (!w) return { e: "fetch-failed" }
+  return {
+    d: {
+      now: w.now, daily: w.daily, hourly: w.hourly,
+      city: cityName || w.city || "当前位置", dist: geo.d || cityName || w.city, str: geo.s,
+      aqi: w.aqi, warn: w.warn
+    }
   }
-  const w = await fw(loc.s, loc.lat, loc.long, key, host)
-  if (!w) {
-    Widget.present(<VStack spacing={8} alignment="center" frame={{ maxWidth: "infinity", maxHeight: "infinity" }} padding={20}>
-      <Image systemName="wifi.slash" frame={{ width: 36, height: 36 }} foregroundStyle="systemRed" />
-      <Text font="body" foregroundStyle="secondaryLabel" frame={{ maxWidth: "infinity", alignment: "center" }}>天气数据获取失败</Text>
-    </VStack>)
-    return
+}
+
+async function main() {
+  let view: any = null
+  try {
+    const r = await build()
+    if ("d" in r) {
+      saveCache(r.d)
+      view = <WV d={r.d} />
+    } else {
+      const cached = loadCache()
+      if (cached) {
+        // 取数失败但手上有上次成功快照 → 静默沿用，不让组件变占位
+        view = <WV d={cached} />
+      } else if (r.e === "missing-key") {
+        view = errView("key.fill", "缺少 API Key，请打开 App 配置", "systemOrange")
+      } else if (r.e === "missing-host") {
+        view = errView("key.fill", "缺少 API Host，请打开 App 配置", "systemOrange")
+      } else if (r.e === "no-location") {
+        view = errView("location.slash.fill", "无法获取位置", "systemRed")
+      } else {
+        view = errView("wifi.slash", "天气数据获取失败", "systemRed")
+      }
+    }
+  } catch {
+    const cached = loadCache()
+    view = cached
+      ? <WV d={cached} />
+      : errView("wifi.slash", "天气数据获取失败", "systemRed")
   }
-  const geo = await rg(loc.lat, loc.long)
-  Widget.present(<WV d={{
-    now: w.now, daily: w.daily, hourly: w.hourly,
-    city: w.city, dist: geo.d || w.city, str: geo.s,
-    aqi: w.aqi, warn: w.warn
-  }} />)
+  // 无论如何必须 present，否则桌面显示“设置小组件”占位
+  try { Widget.present(view) } catch {}
 }
 
 main()

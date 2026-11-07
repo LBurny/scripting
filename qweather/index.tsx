@@ -147,6 +147,10 @@ function Page() {
   const city = data?.city || ""
   const t = w ? Math.round(parseFloat(w.temp)) : null
   const f = w ? Math.round(parseFloat(w.feelsLike)) : null
+  const hiV = daily[0] ? parseFloat(daily[0].tempMax) : NaN
+  const loV = daily[0] ? parseFloat(daily[0].tempMin) : NaN
+  const hi = isNaN(hiV) ? null : Math.round(hiV)
+  const lo = isNaN(loV) ? null : Math.round(loV)
 
   return (
     <NavigationStack>
@@ -177,8 +181,8 @@ function Page() {
               </HStack>
               <Spacer />
               <VStack spacing={0} alignment="trailing">
-                <Text font="title2" foregroundStyle="label" fontWeight="semibold">{w ? `${Math.round(parseFloat(w.tempMax))}°` : "--"}</Text>
-                <Text font="subheadline" foregroundStyle="label" opacity={0.6}>{w ? `${Math.round(parseFloat(w.tempMin))}°` : "--"}</Text>
+                <Text font="title2" foregroundStyle="label" fontWeight="semibold">{hi !== null ? `${hi}°` : "--"}</Text>
+                <Text font="subheadline" foregroundStyle="label" opacity={0.6}>{lo !== null ? `${lo}°` : "--"}</Text>
               </VStack>
             </HStack>
             <Spacer minLength={6} />
